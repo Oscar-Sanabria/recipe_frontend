@@ -5,11 +5,19 @@ const API_HOST = "http://localhost:8000";
 export async function getAllRecipes() {
     const response = await axios.get(`${API_HOST}/recipes`, {
     });
+    console.log("response", response);
     return response.data;
 }
 
 export async function getRecipe(id) {
     const response = await axios.get(`${API_HOST}/recipes/${id}`, {
+    });
+    return response.data;
+}
+
+export async function getRecipeImage(id) {
+    const response = await axios.get(`${API_HOST}/recipeImage/${id}`, {
+        responseType: 'blob' 
     });
     return response.data;
 }
@@ -49,4 +57,46 @@ export async function getRecipesListFiltered(filters) {
         },
     });
     return response.data.data;
+}
+
+export async function createRecipe(form, images) {
+    console.log("form", form);
+    const formData = new FormData();
+    
+    // Convertir el objeto form a JSON string
+    formData.append("recipe_data", JSON.stringify(form));
+    
+    // Agregar cada imagen (suponiendo que "images" es un array de File)
+    images.forEach((image) => {
+        formData.append("images", image);  // el campo es 'images' (sin los corchetes)
+    });
+
+    const response = await axios.post(`${API_HOST}/recipes`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+
+    return response.data;
+}
+
+export async function updateRecipe(form, images) {
+    console.log("form", form);
+    const formData = new FormData();
+    
+    // Convertir el objeto form a JSON string
+    formData.append("recipe_data", JSON.stringify(form));
+    
+    // Agregar cada imagen (suponiendo que "images" es un array de File)
+    images.forEach((image) => {
+        formData.append("images", image);  // el campo es 'images' (sin los corchetes)
+    });
+
+    const response = await axios.post(`${API_HOST}/recipes`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+
+    return response.data;
 }

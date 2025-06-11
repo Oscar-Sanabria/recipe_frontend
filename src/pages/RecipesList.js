@@ -25,6 +25,7 @@ const RecipesPage = () => {
         const fetchCourses = async () => {
             try {
                 const data = await getAllRecipes();
+                console.log("Recetas obtenidas:", data);
                 setRecipes(data);
             } catch (error) {
                 console.error('Error al obtener las recetas:', error);

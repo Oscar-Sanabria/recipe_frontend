@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { getRecipe } from '../services/RecipeService';
+import { getRecipe, getRecipeImage } from '../services/RecipeService';
 import { sendReview } from '../services/RecipeService';
 
 const RecipeDetail = () => {
@@ -9,6 +9,7 @@ const RecipeDetail = () => {
     const [comment, setComment] = useState('');
     const [rating, setRating] = useState(0);
     const [recipe, setRecipe] = useState(null);
+    const [dataImage, setDataImage] = useState(null);
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -39,6 +40,20 @@ const RecipeDetail = () => {
         };
         getRecipeInfo();
     }, [id]);
+
+    useEffect(() => {
+        const getRecipesImage = async () => {
+            try {
+                const blob = await getRecipeImage(id);
+                const imageUrl = URL.createObjectURL(blob);
+                setDataImage(imageUrl);
+            } catch (error) {
+                console.error('Error al obtener la imagen de la receta:', error);
+            }
+        };
+        getRecipesImage();
+    }, [id]);
+
 
     if (!recipe) return <div>Cargando receta...</div>;
     return (
@@ -86,11 +101,8 @@ const RecipeDetail = () => {
                 <div className="col-md-6">
                     <h5>Descripción</h5>
                     <p>{recipe.description}</p>
-                    <img
-                        src={recipe.imagen}
-                        alt="Receta"
-                        className="img-fluid rounded shadow-sm"
-                    />
+                    <img src={dataImage} alt="Recipe" />
+                    {console.log("recipe.images", recipe.images[0])}
                 </div>
             </div>
 
