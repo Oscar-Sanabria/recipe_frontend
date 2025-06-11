@@ -30,7 +30,7 @@ const RecipeDetail = () => {
             setMessage({ type: "success", text: "Reseña enviada" });
             await getRecipeInfo();
             setComment('');
-            setUserName('');   
+            setUserName('');
             setRating(0);
         } catch (err) {
             setMessage({ type: "danger", text: "Error al enviar la reseña" });
@@ -55,7 +55,7 @@ const RecipeDetail = () => {
     useEffect(() => {
         setComment();
         setUserName();
-        setRating();    
+        setRating();
     }, []);
 
     useEffect(() => {
@@ -94,9 +94,20 @@ const RecipeDetail = () => {
                     <style>{`@media (min-width: 768px) {.toast {max-width: 400px;}.toast-body {font-size: 1.25rem;}}`}</style>
                 </ToastContainer>
             )}
-            <button type="button" className="btn btn-dark fw-bold" onClick={() => navigate('/')}>
-                ← Volver
-            </button>
+            <div className="row mb-4">
+                <div className="col-md-3 mb-2">
+                    <button type="button" className="btn btn-dark fw-bold" onClick={() => navigate('/')}>
+                        ← Volver
+                    </button>
+                </div>
+                <div className="col-md-6 mb-2">
+                </div>
+                <div className="col-md-3 mb-2">
+                    <button type="button" className="btn btn-success fw-bold" onClick={() => navigate(`/updateRecipe/${id}`)}>
+                        Editar Receta
+                    </button>
+                </div>
+            </div>
             <h2 className="text-center mb-4">Compartir una receta</h2>
 
             <div className="row border p-4 rounded">

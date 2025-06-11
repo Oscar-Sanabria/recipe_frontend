@@ -80,19 +80,19 @@ export async function createRecipe(form, images) {
     return response.data;
 }
 
-export async function updateRecipe(form, images) {
+export async function updateRecipe(id, form, images) {
     console.log("form", form);
     const formData = new FormData();
-    
+
     // Convertir el objeto form a JSON string
     formData.append("recipe_data", JSON.stringify(form));
-    
+
     // Agregar cada imagen (suponiendo que "images" es un array de File)
     images.forEach((image) => {
-        formData.append("images", image);  // el campo es 'images' (sin los corchetes)
+        formData.append("images", image);
     });
 
-    const response = await axios.post(`${API_HOST}/recipes`, formData, {
+    const response = await axios.put(`${API_HOST}/recipes/${id}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
