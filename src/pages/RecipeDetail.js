@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { getRecipe, getRecipeImage } from '../services/RecipeService';
 import { sendReview } from '../services/RecipeService';
+import { Toast, ToastContainer } from "react-bootstrap";
 
 const RecipeDetail = () => {
     const [userName, setUserName] = useState('');
@@ -12,6 +13,8 @@ const RecipeDetail = () => {
     const [dataImage, setDataImage] = useState(null);
     const { id } = useParams();
     const navigate = useNavigate();
+    const handleCloseToast = () => setMessage({ ...message, show: false });
+    const [message, setMessage] = useState({ type: "", text: "" });
 
     const sendComment = async () => {
         const review = {
@@ -24,22 +27,36 @@ const RecipeDetail = () => {
         console.log("Enviando reseña:", id);
         try {
             await sendReview(id, review);
+            setMessage({ type: "success", text: "Reseña enviada" });
+            await getRecipeInfo();
+            setComment('');
+            setUserName('');   
+            setRating(0);
         } catch (err) {
+            setMessage({ type: "danger", text: "Error al enviar la reseña" });
             console.log("error al enviar la reseña", err);
         }
     };
 
+
+    const getRecipeInfo = async () => {
+        try {
+            const data = await getRecipe(id);
+            setRecipe(data.data);
+        } catch (error) {
+            console.error('Error al obtener la receta:', error);
+        }
+    };
+
     useEffect(() => {
-        const getRecipeInfo = async () => {
-            try {
-                const data = await getRecipe(id);
-                setRecipe(data.data);
-            } catch (error) {
-                console.error('Error al obtener la receta:', error);
-            }
-        };
         getRecipeInfo();
     }, [id]);
+
+    useEffect(() => {
+        setComment();
+        setUserName();
+        setRating();    
+    }, []);
 
     useEffect(() => {
         const getRecipesImage = async () => {
@@ -58,6 +75,25 @@ const RecipeDetail = () => {
     if (!recipe) return <div>Cargando receta...</div>;
     return (
         <div className="container rounded shadow p-5 my-5">
+            {message.text && (
+                <ToastContainer position="bottom-end" className="p-3">
+                    <Toast
+                        show={message.show}
+                        onClose={handleCloseToast}
+                        delay={3000}
+                        autohide
+                        className={`border-0 shadow-lg rounded-3 bg-${message.type} position-relative`}
+                        style={{
+                            minHeight: "80px",
+                        }}
+                    >
+                        <Toast.Body className="text-white px-4 py-3 fs-6 w-100" style={{ fontSize: "1rem" }}>
+                            {message.text}
+                        </Toast.Body>
+                    </Toast>
+                    <style>{`@media (min-width: 768px) {.toast {max-width: 400px;}.toast-body {font-size: 1.25rem;}}`}</style>
+                </ToastContainer>
+            )}
             <button type="button" className="btn btn-dark fw-bold" onClick={() => navigate('/')}>
                 ← Volver
             </button>
@@ -101,9 +137,19 @@ const RecipeDetail = () => {
                 <div className="col-md-6">
                     <h5>Descripción</h5>
                     <p>{recipe.description}</p>
-                    <img src={dataImage} alt="Recipe" />
-                    {console.log("recipe.images", recipe.images[0])}
+                    <div style={{ width: '300px', height: '300px', overflow: 'hidden' }}>
+                        <img
+                            src={dataImage}
+                            alt="Recipe"
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover'
+                            }}
+                        />
+                    </div>
                 </div>
+
             </div>
 
             <hr className="my-4" />
@@ -115,15 +161,15 @@ const RecipeDetail = () => {
             }}>
                 <div className="mb-3">
                     <label htmlFor="comentario" className="form-label">Comentario</label>
-                    <textarea id="comentario" rows="3" className="form-control" onChange={(e) => setComment(e.target.value)} />
+                    <textarea id="comentario" rows="3" value={comment} className="form-control" onChange={(e) => setComment(e.target.value)} />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="autor" className="form-label">Nombre de usuario</label>
-                    <input type="text" id="autor" className="form-control" onChange={(e) => setUserName(e.target.value)} />
+                    <input type="text" id="autor" value={userName} className="form-control" onChange={(e) => setUserName(e.target.value)} />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="Calificación" className="form-label">Calificación</label>
-                    <input type="number" id="Calificación" className="form-control" min="0" max="10" step={1} onChange={(e) => setRating(e.target.value)} />
+                    <input type="number" id="Calificación" value={rating} className="form-control" min="0" max="10" step={1} onChange={(e) => setRating(e.target.value)} />
                 </div>
                 <button type="submit" className="btn btn-primary">Enviar Reseña</button>
             </form>
