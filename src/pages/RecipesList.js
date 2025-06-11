@@ -95,12 +95,12 @@ const RecipesPage = () => {
         const searchPayload = {
             region: selectedRegion || undefined,
             difficulty: selectedDifficult || undefined,
-            durationMin: min !== null ? min : null,
-            durationMax: max !== null ? max : null,
+            duration: {min:min !== null ? min : null, max:max !== null ? max : null},
             ingredients: selectedIngredients.length > 0 ? selectedIngredients : undefined,
             text: searchText || undefined
         };
 
+        console.log("Payload de búsqueda:", searchPayload);
 
         try {
             const data = await getRecipesListFiltered(searchPayload);
